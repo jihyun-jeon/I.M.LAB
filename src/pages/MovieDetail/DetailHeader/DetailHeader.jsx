@@ -5,9 +5,15 @@ import { fetchMovieDetail, fetchMovieVides, fetchMovieBuy } from '../../../api/a
 import { BsHeartFill, BsFillBookmarkFill, BsFillStarFill } from 'react-icons/bs';
 import { TiDeleteOutline } from 'react-icons/ti';
 import Rating from '@mui/material/Rating';
+import { useDispatch, useSelector } from 'react-redux';
+import { add } from '../../../store/movieSlice';
 
 const DetailHeader = ({ path }) => {
-  const [detailData, setDetailData] = useState(null);
+  const dispatch = useDispatch();
+
+  const detailData = useSelector(state => state.movies[path]); // 4. 이후 store깂 사용 - useSelector로 store의 state값 불러와서 사용하면 됨.
+
+  // const [detailData, setDetailData] = useState(null);
   const [videosData, setVideosData] = useState(null);
   const [buyData = {}, setBuyData] = useState(null);
   const [iconStatus, setIconStatus] = useState({
@@ -18,10 +24,12 @@ const DetailHeader = ({ path }) => {
   const [rateValue, setRateValue] = useState(0);
   let [rateShow, setRateShow] = useState(false);
 
-  console.log(detailData); // [TODO] 60625, 429번은 아예 안나옴
-
   useEffect(() => {
-    fetchMovieDetail(path).then(result => setDetailData(result));
+    fetchMovieDetail(path).then(result => {
+      // setDetailData(result);
+
+      dispatch(add(result)); // 3. action을 dispatch하여 가져다 쓴다. 여기에 data담아주면 add()함수가 실행되서 store값이 업데이트 된다.
+    });
     fetchMovieVides(path).then(result => setVideosData(result));
     fetchMovieBuy(path).then(result => setBuyData(result.results.KR));
   }, []);
